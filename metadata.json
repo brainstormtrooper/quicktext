@@ -1,0 +1,8 @@
+{
+  "name": "Quick Text",
+  "description": "Quickly capture text snippets and ideas",
+  "uuid": "quicktext@brainstormtrooper.github.io",
+  "shell-version": [
+    "44"
+  ]
+}
