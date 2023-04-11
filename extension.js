@@ -30,25 +30,43 @@ const ModalDialog = imports.ui.modalDialog;
 const Dialog = imports.ui.dialog;
 const ShellEntry = imports.ui.shellEntry;
 
+const Me = ExtensionUtils.getCurrentExtension();
+const PanelMenu = imports.ui.panelMenu;
+
 class Extension {
   constructor() {
+    this.inputMulti = null;
   }
 
   enable() {
-    let my_settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.quicktext");
-    this.fpath = my_settings.get_string('quick-filepath');
-    this.pendLoc = my_settings.get_string('quick-pendlocation');
-    this.append = my_settings.get_string('quick-append');
-    this.prependStr = my_settings.get_string('quick-prepend');
-    this.inputMulti = my_settings.get_int('quick-multiline');
+    this.settings = ExtensionUtils.getSettings("org.gnome.Shell.Extensions.quicktext");
+    this.fpath = this.settings.get_string('quick-filepath');
+    this.pendLoc = this.settings.get_string('quick-pendlocation');
+    this.append = this.settings.get_string('quick-append');
+    this.prependStr = this.settings.get_string('quick-prepend');
+    this.inputMulti = this.settings.get_int('quick-multiline');
 
     // listen for hotkeys
     Main.wm.addKeybinding(
       "quick-hotkey",
-      my_settings,
+      this.settings,
       Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
       Shell.ActionMode.NORMAL,
       this.doDialog.bind(this));
+
+      // Bind our indicator visibility to the GSettings value
+      //
+      // NOTE: Binding properties only works with GProperties (properties
+      // registered on a GObject class), not native JavaScript properties
+      /*
+      this.settings.bind(
+          'quick-filepath',
+          this.fpath,
+          'value',
+          Gio.SettingsBindFlags.DEFAULT
+      );
+      */
+
   }
 
   disable() {
@@ -71,6 +89,15 @@ class Extension {
     });
     ShellEntry.addContextMenu(entry);
 
+    if (this.inputMulti == 1) {
+      entry.clutter_text.single_line_mode = false;
+      entry.clutter_text.line_wrap        = true;
+    } else {
+      
+      entry.clutter_text.single_line_mode = true;
+    }
+
+    
     this._entryText = entry.clutter_text;
     content.add_child(entry);
     this.dialog.setInitialKeyFocus(this._entryText);
