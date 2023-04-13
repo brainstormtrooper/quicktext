@@ -95,8 +95,8 @@ function fillPreferencesWindow(window) {
   // Add the switch to the row
   suffix.add_suffix(suffixEntry);
   suffix.activatable_widget = suffixEntry;
-
-  // Create a new preferences row
+ 
+  /*
   const position = new Adw.ActionRow({ title: 'Where to insert new notes in the file' });
   group.add(position);
 
@@ -108,10 +108,10 @@ function fillPreferencesWindow(window) {
     Gio.SettingsBindFlags.DEFAULT
   );
 
-  // Add the switch to the row
+ 
   position.add_suffix(positionEntry);
   position.activatable_widget = positionEntry;
-
+  */
   // Add our page to the window
   window.add(page);
 }
