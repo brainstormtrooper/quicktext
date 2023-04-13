@@ -18,10 +18,11 @@
 
 /* exported init */
 const Gio = imports.gi.Gio;
+const GObject = imports.gi.GObject;
 const GLib = imports.gi.GLib;
 const Main = imports.ui.main;
-const Meta = imports.gi.Meta
-const Shell = imports.gi.Shell
+const Meta = imports.gi.Meta;
+const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
 imports.gi.versions.Gtk = "4.0";
 const { Gtk, St } = imports.gi;
@@ -35,37 +36,46 @@ const PanelMenu = imports.ui.panelMenu;
 
 class Extension {
   constructor() {
-    this.inputMulti = null;
-  }
-
-  enable() {
     this.settings = ExtensionUtils.getSettings("org.gnome.Shell.Extensions.quicktext");
+
     this.fpath = this.settings.get_string('quick-filepath');
     this.pendLoc = this.settings.get_string('quick-pendlocation');
     this.append = this.settings.get_string('quick-append');
     this.prependStr = this.settings.get_string('quick-prepend');
     this.inputMulti = this.settings.get_int('quick-multiline');
+  }
 
+  enable() {
+    
+
+    /*
+    this.MyCfgClass = GObject.registerClass({
+      Properties: {
+          'prop': GObject.param_spec_variant('prop', 'Prop', 'Prop',
+              new GLib.VariantType('as'), null,
+              GObject.ParamFlags.READABLE),
+          'fpath': this.settings.get_string('quick-filepath'),
+          'pendLoc': this.settings.get_string('quick-pendlocation'),
+          'append': this.settings.get_string('quick-append'),
+          'prependStr': this.settings.get_string('quick-prepend'),
+          'inputMulti': this.settings.get_int('quick-multiline')
+          
+      },
+    }, class MyCfgClass extends GObject.Object {
+      get fpath() { return this.fpath; }
+      get pendLoc() { return this.pendLoc; }
+      get append() { return this.append; }
+      get prependStr() { return this.prependStr; }
+      get inputMulti() { return this.inputMulti; }
+    });
+    */
     // listen for hotkeys
     Main.wm.addKeybinding(
       "quick-hotkey",
       this.settings,
       Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
       Shell.ActionMode.NORMAL,
-      this.doDialog.bind(this));
-
-      // Bind our indicator visibility to the GSettings value
-      //
-      // NOTE: Binding properties only works with GProperties (properties
-      // registered on a GObject class), not native JavaScript properties
-      /*
-      this.settings.bind(
-          'quick-filepath',
-          this.fpath,
-          'value',
-          Gio.SettingsBindFlags.DEFAULT
-      );
-      */
+      this.doDialog.bind(this));  
 
   }
 
@@ -83,24 +93,34 @@ class Extension {
     let content = new Dialog.MessageDialogContent({ title });
     this.dialog.contentLayout.add_actor(content);
 
-    let entry = new St.Entry({
+    this.entry = new St.Entry({
       style_class: 'quick-dialog-entry',
       can_focus: true,
     });
-    ShellEntry.addContextMenu(entry);
-
-    if (this.inputMulti == 1) {
-      entry.clutter_text.single_line_mode = false;
-      entry.clutter_text.line_wrap        = true;
-    } else {
-      
-      entry.clutter_text.single_line_mode = true;
-    }
-
+    ShellEntry.addContextMenu(this.entry);
+    this.entry.clutter_text.single_line_mode = false;
+    this.entry.clutter_text.line_wrap        = true;
     
-    this._entryText = entry.clutter_text;
-    content.add_child(entry);
+    this._entryText = this.entry.clutter_text;
+    content.add_child(this.entry);
     this.dialog.setInitialKeyFocus(this._entryText);
+
+    this.efpath = new St.Entry({
+      can_focus: false,
+      text: this.fpath
+    });
+    this.ependLoc = new St.Entry({
+      can_focus: false,
+      text: this.pendLoc
+    });  
+    this.eappend = new St.Entry({
+      can_focus: false,
+      text: this.append
+    }); 
+    this.eprepend = new St.Entry({
+      can_focus: false,
+      text: this.prependStr
+    });
 
     // let defaultDescriptionText = _('Press ESC to close');
 
@@ -121,6 +141,41 @@ class Extension {
     });
     this.dialog.open();
 
+    // Bind our indicator visibility to the GSettings value
+    //
+    // NOTE: Binding properties only works with GProperties (properties
+    // registered on a GObject class), not native JavaScript properties
+    
+    this.settings.bind(
+      'quick-multiline',
+      this.entry.clutter_text,
+      'single_line_mode',
+      Gio.SettingsBindFlags.DEFAULT
+    );
+    this.settings.bind(
+      'quick-filepath',
+      this.efpath,
+      'text',
+      Gio.SettingsBindFlags.DEFAULT
+    );
+    this.settings.bind(
+      'quick-pendlocation',
+      this.ependLoc,
+      'text',
+      Gio.SettingsBindFlags.DEFAULT
+    );
+    this.settings.bind(
+      'quick-append',
+      this.eappend,
+      'text',
+      Gio.SettingsBindFlags.DEFAULT
+    );
+    this.settings.bind(
+      'quick-prepend',
+      this.eprepend,
+      'text',
+      Gio.SettingsBindFlags.DEFAULT
+    );
   }
 
   doCreateFile() {
@@ -153,18 +208,21 @@ class Extension {
   }
 
   wrap(str) {
-    if (this.prependStr == '') {
+    if (this.eprepend.text == '') {
       this.prepend = new Date().toString();
     } else {
-      this.prepend = this.prependStr;
+      this.prepend = this.eprepend.text;
     }
-    return `${this.prepend}\r\n${str}\r\n${this.append}`;
+    return `${this.prepend}\r\n${str}\r\n${this.eappend.text}`;
   }
 
   async doSaveSnippet() {
     // create and open file
     try {
-      let fstr = await this.fopen(this.fpath)
+
+
+
+      let fstr = await this.fopen(this.efpath.text)
       // add snippet (this._entryText = entry.clutter_text;)
       let snippet = this._entryText.get_text()
       if (this.pendLoc == 'BEG') {
@@ -173,7 +231,7 @@ class Extension {
         fstr = `${fstr}\r\n${this.wrap(snippet)}`;
       }
       // close file
-      this.save(this.fpath, fstr);
+      this.save(this.efpath.text, fstr);
     } catch (error) {
       log(error);
       // close dialog

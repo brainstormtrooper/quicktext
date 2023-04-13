@@ -14,7 +14,7 @@
               <choice value='BEG'/>
               <choice value='END'/>
             </choices>
-            <default>"BEG"</default>
+            <default>'BEG'</default>
             <summary>Where to add the cool stuff.</summary>
         </key>
         <key name="quick-append" type="s">
@@ -25,8 +25,8 @@
             <default>""</default>
             <summary>What to add before the cool stuff.</summary>
         </key>
-        <key name="quick-multiline" type="i">
-            <default>0</default>
+        <key name="quick-multiline" type="b">
+            <default>false</default>
             <summary>Whether to use multi-line input.</summary>
         </key>
     </schema>

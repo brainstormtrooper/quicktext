@@ -25,7 +25,7 @@ function fillPreferencesWindow(window) {
 
     // Create the switch and bind its value to the `show-indicator` key
     const toggle = new Gtk.Switch({
-        active: settings.get_int ('quick-multiline'),
+        active: settings.get_bool ('quick-multiline'),
         valign: Gtk.Align.CENTER,
     });
     settings.bind(
