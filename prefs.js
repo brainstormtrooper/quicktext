@@ -12,7 +12,7 @@ function init() {
 function fillPreferencesWindow(window) {
     // Use the same GSettings schema as in `extension.js`
     const settings = ExtensionUtils.getSettings(
-        'org.gnome.Shell.Extensions.quicktext');
+        'org.gnome.shell.extensions.quicktext');
     
     // Create a preferences page and group
     const page = new Adw.PreferencesPage();
@@ -25,7 +25,7 @@ function fillPreferencesWindow(window) {
 
     // Create the switch and bind its value to the `show-indicator` key
     const toggle = new Gtk.Switch({
-        active: settings.get_bool ('quick-multiline'),
+        active: settings.get_boolean('quick-multiline'),
         valign: Gtk.Align.CENTER,
     });
     settings.bind(

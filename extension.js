@@ -39,7 +39,7 @@ class Extension {
   }
 
   enable() {
-    this.settings = ExtensionUtils.getSettings("org.gnome.Shell.Extensions.quicktext");
+    this.settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.quicktext");
 
     this.fpath = this.settings.get_string('quick-filepath');
     this.pendLoc = this.settings.get_string('quick-pendlocation');

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-    <schema id="org.gnome.Shell.Extensions.quicktext" path="/org/gnome/shell/extensions/quicktext/">
+    <schema id="org.gnome.shell.extensions.quicktext" path="/org/gnome/shell/extensions/quicktext/">
         <key name="quick-hotkey" type="as">
             <default><![CDATA[['<Ctrl><Super>i']]]></default>
             <summary>Hotkey to open the cool stuff.</summary>
