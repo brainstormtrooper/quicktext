@@ -59,6 +59,12 @@ class Extension {
   disable() {
     // release hotkeys
     Main.wm.removeKeybinding("quick-hotkey");
+    this.settings = null;
+    this.dialog = null;
+    this.efpath = null;
+    this.ependLoc = null;
+    this.eappend = null;
+    this.eprepend = null;
   }
 
   doDialog() {
