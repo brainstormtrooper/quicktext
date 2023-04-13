@@ -2,6 +2,8 @@
   "name": "Quick Text",
   "description": "Quickly capture text snippets and ideas",
   "uuid": "quicktext@brainstormtrooper.github.io",
+  "url": "https://github.com/brainstormtrooper/quicktext",
+  "version": "0.1.2",
   "shell-version": [
     "44"
   ]
