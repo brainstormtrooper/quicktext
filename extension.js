@@ -36,6 +36,9 @@ const PanelMenu = imports.ui.panelMenu;
 
 class Extension {
   constructor() {
+  }
+
+  enable() {
     this.settings = ExtensionUtils.getSettings("org.gnome.Shell.Extensions.quicktext");
 
     this.fpath = this.settings.get_string('quick-filepath');
@@ -43,32 +46,7 @@ class Extension {
     this.append = this.settings.get_string('quick-append');
     this.prependStr = this.settings.get_string('quick-prepend');
     this.inputMulti = this.settings.get_int('quick-multiline');
-  }
 
-  enable() {
-    
-
-    /*
-    this.MyCfgClass = GObject.registerClass({
-      Properties: {
-          'prop': GObject.param_spec_variant('prop', 'Prop', 'Prop',
-              new GLib.VariantType('as'), null,
-              GObject.ParamFlags.READABLE),
-          'fpath': this.settings.get_string('quick-filepath'),
-          'pendLoc': this.settings.get_string('quick-pendlocation'),
-          'append': this.settings.get_string('quick-append'),
-          'prependStr': this.settings.get_string('quick-prepend'),
-          'inputMulti': this.settings.get_int('quick-multiline')
-          
-      },
-    }, class MyCfgClass extends GObject.Object {
-      get fpath() { return this.fpath; }
-      get pendLoc() { return this.pendLoc; }
-      get append() { return this.append; }
-      get prependStr() { return this.prependStr; }
-      get inputMulti() { return this.inputMulti; }
-    });
-    */
     // listen for hotkeys
     Main.wm.addKeybinding(
       "quick-hotkey",

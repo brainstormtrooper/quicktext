@@ -20,7 +20,7 @@ function fillPreferencesWindow(window) {
     page.add(group);
 
     // Create a new preferences row
-    const row = new Adw.ActionRow({ title: 'Show Extension Indicator' });
+    const row = new Adw.ActionRow({ title: 'Only one-line entry' });
     group.add(row);
 
     // Create the switch and bind its value to the `show-indicator` key
