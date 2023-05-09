@@ -5,6 +5,8 @@
   <requires lib="gtk" version="4.6" />
   
   <template class="qWindow" parent="GtkApplicationWindow">
+    <property name="default-height">300</property>
+    <property name="default-width">400</property>
     <child>
       <object class="GtkBox" id="form_area">
         <style>
