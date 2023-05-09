@@ -18,12 +18,14 @@
 
 /* exported init */
 const Gio = imports.gi.Gio;
+// const Adw = imports.gi.Adw;
 const GObject = imports.gi.GObject;
 const GLib = imports.gi.GLib;
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
+// const Gtk = imports.gi.Gtk;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const ModalDialog = imports.ui.modalDialog;
@@ -32,6 +34,8 @@ const ShellEntry = imports.ui.shellEntry;
 
 const Me = ExtensionUtils.getCurrentExtension();
 const PanelMenu = imports.ui.panelMenu;
+const Util = imports.misc.util;
+// const QuickText = Me.imports.actions.QuickText;
 
 class Extension {
   constructor() {
@@ -66,6 +70,19 @@ class Extension {
     this.eappend = null;
     this.eprepend = null;
   }
+
+  doWindow() {
+    try {
+
+      Util.spawn(['.local/share/gnome-shell/extensions/quicktext@brainstormtrooper.github.io/actions.js']);
+
+
+    } catch (error) {
+      log(error);
+    }
+    
+  }
+  
 
   doDialog() {
     // show the quickNote dialog
@@ -114,6 +131,13 @@ class Extension {
         this.dialog.close();
       },
       key: Clutter.KEY_Escape
+    });
+    this.dialog.addButton({
+      label: 'Actions',
+      action: () => {
+        this.doWindow();
+        this.dialog.close();
+      }
     });
     this.dialog.addButton({
       label: 'OK',
