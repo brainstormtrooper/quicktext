@@ -31,27 +31,17 @@ const QuickText = GObject.registerClass( // eslint-disable-line
 
     }
     vfunc_shutdown () {
-      // this._destroyUI();
-      // TODO: see what cleanup needs to be done and create function
       super.vfunc_shutdown();
     }
     vfunc_activate () {
       super.vfunc_activate();
       // Create the application window
-      /*
-      this._window = new Gtk.ApplicationWindow({
-        application: this,
-        title: 'QuickText',
-        default_height: 400,
-        default_width: 600
-      }); 
-      */  
+      
       const window = new qWindow({ application: this });
       this.openButton = window._openButton;
       window._listBox.append(this.getListUI());
       
       window.present();
-      // this._window.present();
     }
     vfunc_startup() {
       super.vfunc_startup();
@@ -66,7 +56,6 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       const schemaObj = { settings_schema: schema }
 
       return new Gio.Settings(schemaObj);
-      // log(settings.get_string('quick-filepath'));
     }
 
     getListUI () {
@@ -84,10 +73,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
 
       try {
         let P = this.doList();
-        // items = await 
         P.then(items => {    
-        
-        
           items.forEach(item => {
             const frame = new Gtk.Frame({
               label:  null
@@ -113,8 +99,6 @@ const QuickText = GObject.registerClass( // eslint-disable-line
 
               const [tmpevent, ] = Gio.File.new_tmp('quick-XXXXXX.ics');
               const bytes = GLib.ByteArray.new_take(eventstr);
-              // log(stream);
-              // stream.write(bytes, null)
               tmpevent.replace_contents(bytes, null, false, null, null);
               launcher.spawnv(['xdg-open', tmpevent.get_path()]);
             });
@@ -153,7 +137,6 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       const settings = this.getSettings();
       const fpath = settings.get_string('quick-filepath');
       const append = settings.get_string('quick-append');
-      // const prepend = settings.get_string('quick-prepend');
       try {
         
         // [\s\S]*?(?<=^---$)
@@ -230,7 +213,6 @@ const QuickText = GObject.registerClass( // eslint-disable-line
     }
 
     fSave(props, ret) {
-      // const parent = props.parent ? props.parent : null;
       const title = props.title ? props.title : 'Save a file';
       const data = props.data;
       const filename = props.filename;
