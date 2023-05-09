@@ -18,14 +18,12 @@
 
 /* exported init */
 const Gio = imports.gi.Gio;
-// const Adw = imports.gi.Adw;
 const GObject = imports.gi.GObject;
 const GLib = imports.gi.GLib;
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
-// const Gtk = imports.gi.Gtk;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const ModalDialog = imports.ui.modalDialog;
@@ -35,7 +33,6 @@ const ShellEntry = imports.ui.shellEntry;
 const Me = ExtensionUtils.getCurrentExtension();
 const PanelMenu = imports.ui.panelMenu;
 const Util = imports.misc.util;
-// const QuickText = Me.imports.actions.QuickText;
 
 class Extension {
   constructor() {
@@ -74,7 +71,7 @@ class Extension {
   doWindow() {
     try {
 
-      Util.spawn(['.local/share/gnome-shell/extensions/quicktext@brainstormtrooper.github.io/actions.js']);
+      Util.spawn([`${Me.path}/actions.js`]);
 
 
     } catch (error) {
@@ -122,12 +119,10 @@ class Extension {
       text: this.prependStr
     });
 
-    // let defaultDescriptionText = _('Press ESC to close');
 
     this.dialog.addButton({
       label: 'Cancel',
       action: () => {
-        // dialog._sendResponse(Gtk.ResponseType.NO);
         this.dialog.close();
       },
       key: Clutter.KEY_Escape
@@ -143,7 +138,6 @@ class Extension {
       label: 'OK',
       action: () => {
         this.doSaveSnippet();
-        // dialog._sendResponse(Gtk.ResponseType.YES);
       }
     });
     this.dialog.open();
