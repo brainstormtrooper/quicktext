@@ -92,26 +92,30 @@ function fillPreferencesWindow(window) {
     Gio.SettingsBindFlags.DEFAULT
   );
 
+
+   // Create a new preferences row
+   const acted = new Adw.ActionRow({ title: 'Hide acted notes' });
+   group.add(acted);
   // Add the switch to the row
   suffix.add_suffix(suffixEntry);
   suffix.activatable_widget = suffixEntry;
  
-  /*
-  const position = new Adw.ActionRow({ title: 'Where to insert new notes in the file' });
-  group.add(position);
-
-  const positionEntry = Gtk.DropDown.new_from_strings(['BEG','END']);
+  const hideacted = new Gtk.Switch({
+    active: settings.get_boolean('quick-hideacted'),
+    valign: Gtk.Align.CENTER,
+  });
   settings.bind(
-    'quick-pendlocation',
-    positionEntry,
-    'selected-item',
+    'quick-hideacted',
+    hideacted,
+    'active',
     Gio.SettingsBindFlags.DEFAULT
   );
 
+  // Add the switch to the row
+  acted.add_suffix(hideacted);
+  acted.activatable_widget = hideacted;
+
  
-  position.add_suffix(positionEntry);
-  position.activatable_widget = positionEntry;
-  */
   // Add our page to the window
   window.add(page);
 }

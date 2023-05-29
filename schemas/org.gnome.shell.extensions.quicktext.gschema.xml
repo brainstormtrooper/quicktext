@@ -29,5 +29,9 @@
             <default>false</default>
             <summary>Whether to use multi-line input.</summary>
         </key>
+        <key name="quick-hideacted" type="b">
+            <default>true</default>
+            <summary>Whether to hide treated notes.</summary>
+        </key>
     </schema>
 </schemalist>
