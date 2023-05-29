@@ -25,5 +25,7 @@ END:VEVENT
 END:VCALENDAR
 `;
 
+var treated = '//Quick treated:{{stamp}}';
+
 // 19980130T134500Z
 // ORGANIZER;CN=John Doe:MAILTO:john.doe@example.com

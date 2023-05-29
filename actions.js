@@ -11,7 +11,7 @@ const GObject = imports.gi.GObject;
 const Gettext = imports.gettext;
 const GioSSS = Gio.SettingsSchemaSource;
 const { qWindow } = imports.interface;
-const { vevent, vtodo } = imports.events;
+const { vevent, vtodo, treated } = imports.events;
 const spl = Gio.SubprocessLauncher;
 
 
@@ -37,11 +37,18 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       super.vfunc_activate();
       // Create the application window
       
-      const window = new qWindow({ application: this });
-      this.openButton = window._openButton;
-      window._listBox.append(this.getListUI());
+      this.window = new qWindow({ application: this });
+      this.openButton = this.window._openButton;
+      this.launcher = new spl();
+      this.openButton.connect('clicked', () => {
+        const settings = this.getSettings();
+
+        this.launcher.spawnv(['xdg-open', settings.get_string('quick-filepath')]);
+      });
       
-      window.present();
+      this.window._listBox.append(this.getListUI());
+      
+      this.window.present();
     }
     vfunc_startup() {
       super.vfunc_startup();
@@ -58,23 +65,23 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       return new Gio.Settings(schemaObj);
     }
 
+    updateListUI (listBox) {
+      this.window._listBox.remove(listBox);
+      this.window._listBox.append(this.getListUI());
+    }
+
     getListUI () {
-      let items = [];
-      const launcher = new spl();
+
       const listBox = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL
       });
 
-      this.openButton.connect('clicked', () => {
-        const settings = this.getSettings();
-
-        launcher.spawnv(['xdg-open', settings.get_string('quick-filepath')]);
-      });
+      
 
       try {
         let P = this.doList();
         P.then(items => {    
-          items.forEach(item => {
+          items.forEach((item, i) => {
             const frame = new Gtk.Frame({
               label:  null
             });
@@ -100,7 +107,12 @@ const QuickText = GObject.registerClass( // eslint-disable-line
               const [tmpevent, ] = Gio.File.new_tmp('quick-XXXXXX.ics');
               const bytes = GLib.ByteArray.new_take(eventstr);
               tmpevent.replace_contents(bytes, null, false, null, null);
-              launcher.spawnv(['xdg-open', tmpevent.get_path()]);
+              this.launcher.spawnv(['xdg-open', tmpevent.get_path()]);
+              
+              items[i] = this.doFlag(item);
+              this.doSave(this.doJoin(items));
+              this.updateListUI(listBox);
+
             });
             liTaskBtn.connect('clicked', () => {
               
@@ -113,6 +125,9 @@ const QuickText = GObject.registerClass( // eslint-disable-line
               }
               this.fSave(props, (res) => {
                 log(res);
+                items[i] = this.doFlag(item);
+                this.doSave(this.doJoin(items));
+                this.updateListUI(listBox);
               });
             });
             liBtns.append(liEventBtn);
@@ -132,19 +147,34 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       return listBox;
     }
 
+    doFlag (item) {
+      return `${item}${treated.replace('{{stamp}}', this.calTimeNow())}\r`;
+    }
+
+    doJoin (items) {
+      const settings = this.getSettings();
+      const append = settings.get_string('quick-append');
+
+      return items.join(append);
+    }
+
     async doList () {
       let res = [];
       const settings = this.getSettings();
+      const hideActed = settings.get_boolean('quick-hideacted');
       const fpath = settings.get_string('quick-filepath');
       const append = settings.get_string('quick-append');
       try {
         
         // [\s\S]*?(?<=^---$)
-        const fileStr = await this.fopen(fpath);
+        let fileStr = await this.fopen(fpath);
         let list = fileStr.split(append);
         
         list.forEach(li => {
-          res.push(li);
+          if ((hideActed && !li.match(/Quick treated/m)) || !hideActed) {
+            res.push(li);
+          }
+          
         });
         
       } catch (error) {
@@ -210,6 +240,14 @@ const QuickText = GObject.registerClass( // eslint-disable-line
           }
         });
       });
+    }
+
+    doSave(str) {
+      const settings = this.getSettings();
+      const fpath = settings.get_string('quick-filepath');
+      const file = Gio.File.new_for_path(fpath);
+      file.replace_contents(str, null, false,
+        Gio.FileCreateFlags.REPLACE_DESTINATION, null);
     }
 
     fSave(props, ret) {
