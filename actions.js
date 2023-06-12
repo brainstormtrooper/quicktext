@@ -184,6 +184,13 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       return res;
     }
 
+    getSummary(note) {
+      const lines = note.trim().split("\n").slice(1);
+      const summary = (lines[0].length > 120) ? lines[0].slice(0, n-1) + '...' : lines[0];
+      const desc = lines.join("\n");
+      return [summary, desc];
+    }
+
     calTimeNow () {
       const stamp = GLib.DateTime.new_now_utc();
       const nowStr = stamp.format('%Y%m%dT%H%M%SZ');
@@ -203,7 +210,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
         myCal = myCal.replace(slug, nowStr);
       });
       myCal = myCal.replace(/{{uuid}}/gm, id);
-      myCal = myCal.replace(/{{note}}/gm, note);
+      myCal = myCal.replace(/{{note}}/gm, this.getSummary(note)[0]);
       
       return myCal;
     }
