@@ -3,11 +3,12 @@ VERSION:2.0
 PRODID:-//BrainstormTrooper//NONSGML My quicktext//EN
 BEGIN:VTODO
 DTSTAMP:{{stamp}}
-SEQUENCE:2
+SEQUENCE:0
 UID:{{uuid}}@brainstormtrooper.github.io
 DUE:{{duedate}}
 STATUS:NEEDS-ACTION
-SUMMARY:{{note}}
+SUMMARY:{{summary}}
+DESCRIPTION:{{note}} 
 END:VTODO
 END:VCALENDAR
 `;
@@ -20,7 +21,8 @@ UID:{{uuid}}@brainstormtrooper.github.io
 DTSTAMP:{{stamp}}
 DTSTART:{{startdate}}
 DTEND:{{enddate}}
-SUMMARY:{{note}}
+SUMMARY:{{summary}}
+DESCRIPTION:{{note}}
 END:VEVENT
 END:VCALENDAR
 `;
