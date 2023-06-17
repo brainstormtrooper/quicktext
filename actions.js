@@ -118,17 +118,14 @@ const QuickText = GObject.registerClass( // eslint-disable-line
               
               const todostr = this.strRepl(vtodo, item);
 
+              const [tmptodo, ] = Gio.File.new_tmp('quick-XXXXXX.ics');
               const bytes = GLib.ByteArray.new_take(todostr);
-              const props = {
-                data: bytes,
-                filename: 'task.ics'
-              }
-              this.fSave(props, (res) => {
-                log(res);
-                items[i] = this.doFlag(item);
-                this.doSave(this.doJoin(items));
-                this.updateListUI(listBox);
-              });
+              tmptodo.replace_contents(bytes, null, false, null, null);
+              this.launcher.spawnv(['xdg-open', tmptodo.get_path()]);
+              
+              items[i] = this.doFlag(item);
+              this.doSave(this.doJoin(items));
+              this.updateListUI(listBox);
             });
             liBtns.append(liEventBtn);
             liBtns.append(liTaskBtn);
@@ -148,7 +145,9 @@ const QuickText = GObject.registerClass( // eslint-disable-line
     }
 
     doFlag (item) {
-      return `${item}${treated.replace('{{stamp}}', this.calTimeNow())}\r`;
+      const now = GLib.DateTime.new_now_utc();
+      const stamp = now.format('%Y%m%dT%H%M%SZ');
+      return `${item}${treated.replace('{{stamp}}', stamp)}\r`;
     }
 
     doJoin (items) {
@@ -186,32 +185,30 @@ const QuickText = GObject.registerClass( // eslint-disable-line
 
     getSummary(note) {
       const lines = note.trim().split("\n").slice(1);
-      const summary = (lines[0].length > 120) ? lines[0].slice(0, n-1) + '...' : lines[0];
-      const desc = lines.join("\n");
+      const summary = (lines[0].length > 90) ? lines[0].slice(0, n-1) + '...' : lines[0];
+      const desc = lines.join('\n');
       return [summary, desc];
-    }
-
-    calTimeNow () {
-      const stamp = GLib.DateTime.new_now_utc();
-      const nowStr = stamp.format('%Y%m%dT%H%M%SZ');
-      
-      return nowStr;
     }
 
     strRepl (tpl, note) {
       let myCal = tpl;
-      
-      const nowStr = this.calTimeNow();
       const id = this.makeid();
 
-      const times = [/{{stamp}}/gm, /{{duedate}}/gm, /{{startdate}}/gm, /{{enddate}}/gm];
-
-      times.forEach(slug => {
-        myCal = myCal.replace(slug, nowStr);
-      });
-      myCal = myCal.replace(/{{uuid}}/gm, id);
-      myCal = myCal.replace(/{{note}}/gm, this.getSummary(note)[0]);
+      const now = GLib.DateTime.new_now_utc();
+      const stamp = now.format('%Y%m%dT%H%M%SZ');
+      const start = now.add_days(1);
+      const startdue = start.format('%Y%m%dT%H%M%SZ');
+      const end = start.add_hours(1);
+      const enddate = end.format('%Y%m%dT%H%M%SZ');
       
+      myCal = myCal.replace(/{{stamp}}/gm, stamp);
+      myCal = myCal.replace(/{{duedate}}/gm, startdue);
+      myCal = myCal.replace(/{{startdate}}/gm, startdue);
+      myCal = myCal.replace(/{{enddate}}/gm, enddate);
+      myCal = myCal.replace(/{{uuid}}/gm, id);
+      myCal = myCal.replace(/{{summary}}/gm, this.getSummary(note)[0]);
+      myCal = myCal.replace(/{{note}}/gm, this.getSummary(note)[1]);
+
       return myCal;
     }
 
