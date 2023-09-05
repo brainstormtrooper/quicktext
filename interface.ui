@@ -13,11 +13,14 @@
           <class name="form_area_box" />
           <class name="main_form_area" />
         </style>
+        <property name="margin-start">6px</property>
+        <property name="margin-end">6px</property>
         <property name="orientation">vertical</property>
         <property name="vexpand">true</property>
         <property name="hexpand">true</property>
         <child>
           <object class="GtkScrolledWindow" id="scrollViev">
+            
             <property name="vexpand">true</property>
             <property name="hexpand">true</property>
             <child>
@@ -25,6 +28,9 @@
                 <property name="orientation">vertical</property>
                 <property name="vexpand">true</property>
                 <property name="hexpand">true</property>
+                <style>
+                  <class name="list_box" />
+                </style>
               </object>
             </child>
           </object>

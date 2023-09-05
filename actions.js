@@ -1,6 +1,7 @@
 #!/usr/bin/gjs
 'use strict';
 const extPath = '.local/share/gnome-shell/extensions/quicktext@brainstormtrooper.github.io';
+const GTKSCHEMA_KEY = "org.gnome.desktop.interface";
 imports.gi.versions.Gtk = '4.0';
 imports.searchPath.unshift(extPath);
 const GLib = imports.gi.GLib;
@@ -37,6 +38,24 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       super.vfunc_activate();
       // Create the application window
       
+      try {
+        let gtk_settings = new Gio.Settings({ schema: GTKSCHEMA_KEY });
+        let cur_theme = gtk_settings.get_string("gtk-theme");
+        let shell_theme = gtk_settings.get_string("color-scheme");
+        let variant = null;
+        if (shell_theme.endsWith('-dark')) {
+          variant = 'dark';
+        }
+
+        const css_provider = Gtk.CssProvider.new();
+        css_provider.load_named(cur_theme, variant);
+        const display = Gdk.Display.get_default();
+        Gtk.StyleContext.add_provider_for_display(display, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+      
+      } catch (error) {
+        log(error);
+      }
+
       this.window = new qWindow({ application: this });
       this.openButton = this.window._openButton;
       this.launcher = new spl();
@@ -50,6 +69,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       
       this.window.present();
     }
+
     vfunc_startup() {
       super.vfunc_startup();
     }
@@ -73,7 +93,8 @@ const QuickText = GObject.registerClass( // eslint-disable-line
     getListUI () {
 
       const listBox = new Gtk.Box({
-        orientation: Gtk.Orientation.VERTICAL
+        orientation: Gtk.Orientation.VERTICAL,
+        spacing: 6
       });
 
       
@@ -129,8 +150,11 @@ const QuickText = GObject.registerClass( // eslint-disable-line
             });
             liBtns.append(liEventBtn);
             liBtns.append(liTaskBtn);
+            liBtns.add_css_class('linked');
+            
             liBox.append(liLabel);
             liBox.append(liBtns);
+            liBox.add_css_class('card');
             frame.set_child(liBox);
             listBox.append(frame);
 
