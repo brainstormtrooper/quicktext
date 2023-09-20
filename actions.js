@@ -1,9 +1,9 @@
 #!/usr/bin/gjs
 'use strict';
 const extPath = '.local/share/gnome-shell/extensions/quicktext@brainstormtrooper.github.io';
-const GTKSCHEMA_KEY = "org.gnome.desktop.interface";
 imports.gi.versions.Gtk = '4.0';
 imports.searchPath.unshift(extPath);
+const Adw = imports.gi.Adw;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
@@ -21,7 +21,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
   {
     GTypeName: 'QuickText'
   },
-  class QuickText extends Gtk.Application {
+  class QuickText extends Adw.Application {
     _init () {
       this.ID = 'com.github.brainstormtrooper.QuickText';
       super._init({
@@ -39,19 +39,13 @@ const QuickText = GObject.registerClass( // eslint-disable-line
       // Create the application window
       
       try {
-        let gtk_settings = new Gio.Settings({ schema: GTKSCHEMA_KEY });
-        let cur_theme = gtk_settings.get_string("gtk-theme");
-        let shell_theme = gtk_settings.get_string("color-scheme");
-        let variant = null;
-        if (shell_theme.endsWith('-dark')) {
-          variant = 'dark';
-        }
-
-        const css_provider = Gtk.CssProvider.new();
-        css_provider.load_named(cur_theme, variant);
+          
+        let css_provider = Gtk.CssProvider.new();
+        css_provider.load_from_path(`${extPath}/stylesheet.css`);
+        // const context = new Gtk.StyleContext();
         const display = Gdk.Display.get_default();
         Gtk.StyleContext.add_provider_for_display(display, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-      
+
       } catch (error) {
         log(error);
       }
