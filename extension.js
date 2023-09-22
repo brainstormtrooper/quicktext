@@ -29,7 +29,7 @@ import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Dialog from 'resource:///org/gnome/shell/ui/dialog.js';
 import * as ShellEntry from 'resource:///org/gnome/shell/ui/shellEntry.js';
 import * as Util from 'resource:///org/gnome/shell/misc/util.js';
-import * as ExtensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
+// import * as ExtensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 
@@ -74,7 +74,7 @@ export default class QuickText extends Extension {
 
 
     } catch (error) {
-      log(error);
+      console.error(error);
     }
     
   }
@@ -178,9 +178,7 @@ export default class QuickText extends Extension {
     );
   }
 
-  doCreateFile() {
-
-  }
+  
 
   fopen (path) {
     return new Promise((resolve, reject) => {
@@ -195,7 +193,7 @@ export default class QuickText extends Extension {
   
           resolve(dataString);
         } catch (e) {
-          logError(e, 'File error');
+          console.error(e);
           
           reject(e);
         }
@@ -233,7 +231,7 @@ export default class QuickText extends Extension {
       // close file
       this.save(this.efpath.text, fstr);
     } catch (error) {
-      log(error);
+      console.error(error)
       // close dialog
       this.dialog.close();
     }
@@ -243,11 +241,4 @@ export default class QuickText extends Extension {
   }
 
 }
-
-function init() {
-  return new Extension();
-}
-
-
-
 
