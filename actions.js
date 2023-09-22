@@ -47,7 +47,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
         Gtk.StyleContext.add_provider_for_display(display, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
       } catch (error) {
-        log(error);
+        console.error(error);
       }
 
       this.window = new qWindow({ application: this });
@@ -95,8 +95,9 @@ const QuickText = GObject.registerClass( // eslint-disable-line
 
       try {
         let P = this.doList();
-        P.then(items => {    
-          items.forEach((item, i) => {
+        P.then(items => {  
+          items.filter(item => /\S/.test(item)).forEach((item, i) => {
+            
             const frame = new Gtk.Frame({
               label:  null
             });
@@ -106,16 +107,62 @@ const QuickText = GObject.registerClass( // eslint-disable-line
             const liLabel = new Gtk.Label({
               label: item
             });
+
+            const liTxtView = new Gtk.TextView();
+            const liBuffer = new Gtk.TextBuffer();
+            liBuffer.set_text(item, -1);
+            liTxtView.set_buffer(liBuffer);
+            liTxtView.set_editable(false);
+
             const liBtns = new Gtk.Box({
               orientation: Gtk.Orientation.HORIZONTAL,
               halign: Gtk.Align.END
             });
+
+            const liEditBtn = new Gtk.Button({
+              label: 'Edit'
+            });
+            const liSaveBtn = new Gtk.Button({
+              label: 'Save',
+              visible: false
+            });
+            const liCancelBtn = new Gtk.Button({
+              label: 'Cancel',
+              visible: false
+            });
+
             const liEventBtn = new Gtk.Button({
               label: 'New Event'
             });
             const liTaskBtn = new Gtk.Button({
               label: 'New Task'
             });
+
+            liEditBtn.connect('clicked', () => {
+              liEditBtn.set_visible(false);
+              liSaveBtn.set_visible(true);
+              liCancelBtn.set_visible(true);
+              liTxtView.set_editable(true);
+            });
+
+            liCancelBtn.connect('clicked', () => {
+              liEditBtn.set_visible(true);
+              liSaveBtn.set_visible(false);
+              liCancelBtn.set_visible(false);
+              liTxtView.set_editable(false);
+              this.updateListUI(listBox);
+            });
+
+            liSaveBtn.connect('clicked', () => {
+              liEditBtn.set_visible(true);
+              liSaveBtn.set_visible(false);
+              liCancelBtn.set_visible(false);
+              liTxtView.set_editable(false);
+              items[i] = liBuffer.get_text(liBuffer.get_start_iter(), liBuffer.get_end_iter(), true);
+              this.doSave(this.doJoin(items));
+              this.updateListUI(listBox);
+            });
+
             liEventBtn.connect('clicked', () => {
               const eventstr = this.strRepl(vevent, item);
 
@@ -142,11 +189,14 @@ const QuickText = GObject.registerClass( // eslint-disable-line
               this.doSave(this.doJoin(items));
               this.updateListUI(listBox);
             });
+            liBtns.append(liEditBtn);
+            liBtns.append(liSaveBtn);
+            liBtns.append(liCancelBtn);
             liBtns.append(liEventBtn);
             liBtns.append(liTaskBtn);
             liBtns.add_css_class('linked');
             
-            liBox.append(liLabel);
+            liBox.append(liTxtView);
             liBox.append(liBtns);
             liBox.add_css_class('card');
             frame.set_child(liBox);
@@ -156,7 +206,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
         
         });
       } catch (error) {
-        log(error);
+        console.error(error);
       }
 
       return listBox;
@@ -195,7 +245,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
         });
         
       } catch (error) {
-        log(error);
+        console.error(error);
       }
       
       return res;
@@ -256,7 +306,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
     
             resolve(dataString);
           } catch (e) {
-            log(e);
+            console.error(e);
             
             reject(e);
           }
@@ -272,38 +322,6 @@ const QuickText = GObject.registerClass( // eslint-disable-line
         Gio.FileCreateFlags.REPLACE_DESTINATION, null);
     }
 
-    fSave(props, ret) {
-      const title = props.title ? props.title : 'Save a file';
-      const data = props.data;
-      const filename = props.filename;
-      const foldername = props.foldername;
-    
-    
-      const saver = new Gtk.FileDialog({ title });
-    
-      if (filename) {
-        saver.set_initial_name(filename);
-      }
-      if (foldername) {
-        saver.set_initial_folder(Gio.File.new_for_path(foldername));
-      }
-      saver.save(null, null, async (o, r) => {
-      
-        try {
-          const dest = await o.save_finish(r);
-          dest.replace_contents(data, null, false,
-            Gio.FileCreateFlags.REPLACE_DESTINATION, null);
-          ret(dest.get_basename());
-        } catch (e) {
-          log(e)
-          throw e;
-        }
-    
-      });
-    
-    }
-    
-
   }
 )
 const qtapp = new QuickText();
@@ -311,5 +329,5 @@ const qtapp = new QuickText();
 try {
   qtapp.run([imports.system.programInvocationName]);
 } catch (error) {
-  log(error);
+  console.error(error);
 }
