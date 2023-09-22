@@ -3,9 +3,10 @@
   "description": "Quickly capture text snippets and ideas, then convert them to tasks or events",
   "name": "Quick Text",
   "shell-version": [
-    "44"
+    "44",
+    "45"
   ],
   "url": "https://github.com/brainstormtrooper/quicktext",
   "uuid": "quicktext@brainstormtrooper.github.io",
-  "version": 8
+  "version": 9
 }

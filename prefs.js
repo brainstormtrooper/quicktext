@@ -1,17 +1,16 @@
 'use strict';
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
 
-const { Adw, Gio, Gtk } = imports.gi;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 
-function init() {
-}
+export default class MyExtensionPreferences extends ExtensionPreferences {
 
-function fillPreferencesWindow(window) {
+fillPreferencesWindow(window) {
   // Use the same GSettings schema as in `extension.js`
-  const settings = ExtensionUtils.getSettings(
+  const settings = this.getSettings(
     'org.gnome.shell.extensions.quicktext');
 
   // Create a preferences page and group
@@ -118,4 +117,5 @@ function fillPreferencesWindow(window) {
  
   // Add our page to the window
   window.add(page);
+}
 }

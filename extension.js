@@ -17,29 +17,28 @@
  */
 
 /* exported init */
-const Gio = imports.gi.Gio;
-const GObject = imports.gi.GObject;
-const GLib = imports.gi.GLib;
-const Main = imports.ui.main;
-const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
-const ExtensionUtils = imports.misc.extensionUtils;
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const ModalDialog = imports.ui.modalDialog;
-const Dialog = imports.ui.dialog;
-const ShellEntry = imports.ui.shellEntry;
 
-const Me = ExtensionUtils.getCurrentExtension();
-const PanelMenu = imports.ui.panelMenu;
-const Util = imports.misc.util;
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import * as Dialog from 'resource:///org/gnome/shell/ui/dialog.js';
+import * as ShellEntry from 'resource:///org/gnome/shell/ui/shellEntry.js';
+import * as Util from 'resource:///org/gnome/shell/misc/util.js';
+import * as ExtensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
+import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-class Extension {
-  constructor() {
-  }
+
+
+export default class QuickText extends Extension {
+
 
   enable() {
-    this.settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.quicktext");
+    this.settings = this.getSettings("org.gnome.shell.extensions.quicktext");
 
     this.fpath = this.settings.get_string('quick-filepath');
     this.pendLoc = this.settings.get_string('quick-pendlocation');
@@ -71,7 +70,7 @@ class Extension {
   doWindow() {
     try {
 
-      Util.spawn([`${Me.path}/actions.js`]);
+      Util.spawn([`${this.path}/actions.js`]);
 
 
     } catch (error) {
