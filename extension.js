@@ -82,8 +82,8 @@ export default class QuickText extends Extension {
   
 
   doDialog() {
-    this.max_len_multi = 2000;
-    this.max_len_single = 250;
+    this.max_len_multi = 1000;
+    this.max_len_single = 128;
     this.max_len = '';
 
     // show the quickNote dialog
@@ -100,7 +100,7 @@ export default class QuickText extends Extension {
       y_expand: true,
       x_expand: false
     });
-    this.entry.clutter_text.max_length = 2000;
+    this.entry.clutter_text.max_length = 1000;
     this.entry.clutter_text.activatable = false;
     this.entry.clutter_text.single_line_mode = false;
     this.entry.clutter_text.line_wrap = true;
@@ -199,7 +199,7 @@ export default class QuickText extends Extension {
     } else {
       this.max_len = this.max_len_multi;
     }
-
+    this.entry.clutter_text.max_length = this.max_len;
 
     this.settings.bind(
       'quick-filepath',
@@ -260,7 +260,7 @@ export default class QuickText extends Extension {
     } else {
       this.prepend = this.eprepend.text;
     }
-    return `${this.prepend}\r${str}\r${this.eappend.text}`;
+    return `${this.prepend}\n${str}\n${this.eappend.text}`;
   }
 
   async doSaveSnippet() {
@@ -273,9 +273,9 @@ export default class QuickText extends Extension {
       // add snippet (this._entryText = entry.clutter_text;)
       let snippet = this.entry.clutter_text.get_text();
       if (this.pendLoc == 'BEG') {
-        fstr = `${this.wrap(snippet)}\r${fstr.trim()}`;
+        fstr = `${this.wrap(snippet)}\n${fstr.trim()}`;
       } else {
-        fstr = `${fstr.trim()}\r${this.wrap(snippet)}`;
+        fstr = `${fstr.trim()}\n${this.wrap(snippet)}`;
       }
       // close file
       this.save(this.efpath.text, fstr);
