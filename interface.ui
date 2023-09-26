@@ -3,72 +3,81 @@
 <interface>
   <!-- interface-name gtk4uis.ui -->
   <requires lib="gtk" version="4.6" />
-  
+
   <template class="qWindow" parent="GtkApplicationWindow">
     <property name="default-height">300</property>
     <property name="default-width">400</property>
+
     <child>
-      <object class="GtkBox" id="form_area">
-        <style>
-          <class name="form_area_box" />
-          <class name="main_form_area" />
-        </style>
-        <property name="margin-start">6px</property>
-        <property name="margin-end">6px</property>
-        <property name="orientation">vertical</property>
-        <property name="vexpand">true</property>
-        <property name="hexpand">true</property>
-        <child>
-          <object class="GtkScrolledWindow" id="scrollViev">
-            
+      <object class="AdwToastOverlay" id="toast_overlay">
+        <property name="child">
+
+
+          <object class="GtkBox" id="form_area">
+            <style>
+              <class name="form_area_box" />
+              <class name="main_form_area" />
+            </style>
+            <property name="margin-start">6px</property>
+            <property name="margin-end">6px</property>
+            <property name="orientation">vertical</property>
             <property name="vexpand">true</property>
             <property name="hexpand">true</property>
             <child>
-              <object class="GtkBox" id="listBox">
-                <property name="orientation">vertical</property>
+              <object class="GtkScrolledWindow" id="scrollViev">
+
                 <property name="vexpand">true</property>
                 <property name="hexpand">true</property>
-                <style>
-                  <class name="list_box" />
-                </style>
-              </object>
-            </child>
-          </object>
-        </child>
-        <child>
-          <object class="GtkBox" id="openBox">
-            <property name="orientation">horizontal</property>
-            <property name="vexpand">false</property>
-            <property name="hexpand">true</property>
-            <property name="halign">end</property>
-            <style>
-              <class name="formelementgroup" />
-              <class name="formrow" />
-            </style>
-            <child>
-              <object class="GtkLabel" id="openLabel">
-                <style>
-                  <class name="formelement" />
-                  <class name="formlabel" />
-                </style>
-                <property name="label" translatable="yes">Open Note Page</property>
+                <child>
+                  <object class="GtkBox" id="listBox">
+                    <property name="orientation">vertical</property>
+                    <property name="vexpand">true</property>
+                    <property name="hexpand">true</property>
+                    <style>
+                      <class name="list_box" />
+                    </style>
+                  </object>
+                </child>
               </object>
             </child>
             <child>
-              <object class="GtkButton" id="openButton">
-                <property name="label" translatable="yes">Open</property>
+              <object class="GtkBox" id="openBox">
+                <property name="orientation">horizontal</property>
+                <property name="vexpand">false</property>
+                <property name="hexpand">true</property>
+                <property name="halign">end</property>
                 <style>
-                  <class name="formelement" />
-                  <class name="forminput" />
-                  <class name="button" />
-                  <class name="new" />
+                  <class name="formelementgroup" />
+                  <class name="formrow" />
                 </style>
+                <child>
+                  <object class="GtkLabel" id="openLabel">
+                    <style>
+                      <class name="formelement" />
+                      <class name="formlabel" />
+                    </style>
+                    <property name="label" translatable="yes">Open Note Page</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="openButton">
+                    <property name="label" translatable="yes">Open</property>
+                    <style>
+                      <class name="formelement" />
+                      <class name="forminput" />
+                      <class name="button" />
+                      <class name="new" />
+                    </style>
+                  </object>
+                </child>
+
               </object>
             </child>
-            
           </object>
-        </child>
+
+        </property>
       </object>
     </child>
+
   </template>
 </interface>

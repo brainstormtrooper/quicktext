@@ -2,4 +2,9 @@
 
 .quick-dialog-entry {
     width: 28em;
+    max-height: 150px;
+}
+
+.scroll-box {
+    max-height: 150px;
 }
