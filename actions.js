@@ -23,6 +23,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
   },
   class QuickText extends Adw.Application {
     _init () {
+      this.recycle = {};
       this.ID = 'com.github.brainstormtrooper.QuickText';
       super._init({
         application_id: this.ID
@@ -52,6 +53,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
 
       this.window = new qWindow({ application: this });
       this.openButton = this.window._openButton;
+      this.toastOverlay = this.window._toast_overlay;
       this.launcher = new spl();
       this.openButton.connect('clicked', () => {
         const settings = this.getSettings();
@@ -104,10 +106,17 @@ const QuickText = GObject.registerClass( // eslint-disable-line
             const liBox = new Gtk.Box({
               orientation: Gtk.Orientation.VERTICAL
             });
-            const liLabel = new Gtk.Label({
-              label: item
+            const undeleteAction = new Gio.SimpleAction({name: `undelete_${i}`});
+            undeleteAction.connect('activate', () => {
+              items.splice(i, 0, this.recycle[i]);
+              // items[i] = this.recycle[i];
+              this.doSave(this.doJoin(items));
+              this.updateListUI(listBox);
             });
-
+            this.add_action(undeleteAction);
+            const undeleteToast = new Adw.Toast({title: 'Note deleted'});
+            undeleteToast.set_button_label('Undo');
+            undeleteToast.set_action_name(`app.undelete_${i}`);
             const liTxtView = new Gtk.TextView();
             const liBuffer = new Gtk.TextBuffer();
             liBuffer.set_text(item, -1);
@@ -119,23 +128,41 @@ const QuickText = GObject.registerClass( // eslint-disable-line
               halign: Gtk.Align.END
             });
 
+            const liDeleteBtn = new Gtk.Button({
+              icon_name: 'user-trash-symbolic',
+              tooltip_text: 'Delete'
+            });
+
             const liEditBtn = new Gtk.Button({
-              label: 'Edit'
+              icon_name: 'document-edit-symbolic',
+              tooltip_text: 'Edit'
             });
             const liSaveBtn = new Gtk.Button({
-              label: 'Save',
+              icon_name: 'document-save-symbolic',
+              tooltip_text: 'Save',
               visible: false
             });
             const liCancelBtn = new Gtk.Button({
-              label: 'Cancel',
+              icon_name: 'edit-delete-symbolic',
+              tooltip_text: 'Cancel',
               visible: false
             });
 
             const liEventBtn = new Gtk.Button({
-              label: 'New Event'
+              icon_name: 'x-office-calendar-symbolic',
+              tooltip_text: 'New Event'
             });
             const liTaskBtn = new Gtk.Button({
-              label: 'New Task'
+              icon_name: 'object-select-symbolic',
+              tooltip_text: 'New Task'
+            });
+
+            liDeleteBtn.connect('clicked', () => {
+              this.recycle[i] = item;
+              items = items.filter(v => v != item);
+              this.doSave(this.doJoin(items));
+              this.toastOverlay.add_toast(undeleteToast);
+              this.updateListUI(listBox);
             });
 
             liEditBtn.connect('clicked', () => {
@@ -158,8 +185,9 @@ const QuickText = GObject.registerClass( // eslint-disable-line
               liSaveBtn.set_visible(false);
               liCancelBtn.set_visible(false);
               liTxtView.set_editable(false);
-              items[i] = liBuffer.get_text(liBuffer.get_start_iter(), liBuffer.get_end_iter(), true);
+              items[i] = `${liBuffer.get_text(liBuffer.get_start_iter(), liBuffer.get_end_iter(), true).trim()}\r`;
               this.doSave(this.doJoin(items));
+              // this.toastOverlay.add_toast(undeleteToast);
               this.updateListUI(listBox);
             });
 
@@ -194,7 +222,8 @@ const QuickText = GObject.registerClass( // eslint-disable-line
             liBtns.append(liCancelBtn);
             liBtns.append(liEventBtn);
             liBtns.append(liTaskBtn);
-            liBtns.add_css_class('linked');
+            liBtns.append(liDeleteBtn);
+            liBtns.add_css_class('toolbar');
             
             liBox.append(liTxtView);
             liBox.append(liBtns);

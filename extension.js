@@ -24,6 +24,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
+import Pango from 'gi://Pango';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Dialog from 'resource:///org/gnome/shell/ui/dialog.js';
@@ -81,6 +82,10 @@ export default class QuickText extends Extension {
   
 
   doDialog() {
+    this.max_len_multi = 2000;
+    this.max_len_single = 250;
+    this.max_len = '';
+
     // show the quickNote dialog
     this.dialog = new ModalDialog.ModalDialog();
 
@@ -88,18 +93,54 @@ export default class QuickText extends Extension {
 
     let content = new Dialog.MessageDialogContent({ title });
     this.dialog.contentLayout.add_actor(content);
+    
 
     this.entry = new St.Entry({
-      style_class: 'quick-dialog-entry',
-      can_focus: true,
+      width: 400,
+      y_expand: true,
+      x_expand: false
     });
-    ShellEntry.addContextMenu(this.entry);
+    this.entry.clutter_text.max_length = 2000;
+    this.entry.clutter_text.activatable = false;
     this.entry.clutter_text.single_line_mode = false;
-    this.entry.clutter_text.line_wrap        = true;
+    this.entry.clutter_text.line_wrap = true;
+    this.entry.clutter_text.line_wrap_mode = Pango.WrapMode.WORD;
+  
+    ShellEntry.addContextMenu(this.entry);
     
-    this._entryText = this.entry.clutter_text;
-    content.add_child(this.entry);
-    this.dialog.setInitialKeyFocus(this._entryText);
+    const layout = new St.BoxLayout({
+      width: 400
+    });
+    layout.add_child(this.entry);
+
+    const scrollView = new St.ScrollView({
+      overlay_scrollbars: true,
+      hscrollbar_policy: St.PolicyType.NEVER,
+      vscrollbar_policy: St.PolicyType.AUTOMATIC,
+      width: 400,
+      style_class: 'scroll-box'
+    });
+    scrollView.add_actor(layout);
+    
+    this.counter = new St.Label({
+      text: `${this.entry.get_text().length}/${this.max_len}`
+    });
+
+    this.entry.clutter_text.connect('text-changed', () => {
+      this.counter.set_text(`${this.entry.get_text().length}/${this.max_len}`);
+    })
+
+    const box = new St.BoxLayout({
+      width: 400,
+      vertical: true
+
+    });
+
+
+    box.add_child(scrollView);
+    box.add_child(this.counter);
+    content.add_child(box);
+    this.dialog.setInitialKeyFocus(this.entry);
 
     this.efpath = new St.Entry({
       can_focus: false,
@@ -152,6 +193,14 @@ export default class QuickText extends Extension {
       'single_line_mode',
       Gio.SettingsBindFlags.DEFAULT
     );
+    
+    if (this.entry.clutter_text.single_line_mode) {
+      this.max_len = this.max_len_single;
+    } else {
+      this.max_len = this.max_len_multi;
+    }
+
+
     this.settings.bind(
       'quick-filepath',
       this.efpath,
@@ -211,7 +260,7 @@ export default class QuickText extends Extension {
     } else {
       this.prepend = this.eprepend.text;
     }
-    return `${this.prepend}\r\n${str}\r\n${this.eappend.text}`;
+    return `${this.prepend}\r${str}\r${this.eappend.text}`;
   }
 
   async doSaveSnippet() {
@@ -222,11 +271,11 @@ export default class QuickText extends Extension {
 
       let fstr = await this.fopen(this.efpath.text)
       // add snippet (this._entryText = entry.clutter_text;)
-      let snippet = this._entryText.get_text()
+      let snippet = this.entry.clutter_text.get_text();
       if (this.pendLoc == 'BEG') {
-        fstr = `${this.wrap(snippet)}\r\n${fstr}`;
+        fstr = `${this.wrap(snippet)}\r${fstr.trim()}`;
       } else {
-        fstr = `${fstr}\r\n${this.wrap(snippet)}`;
+        fstr = `${fstr.trim()}\r${this.wrap(snippet)}`;
       }
       // close file
       this.save(this.efpath.text, fstr);
