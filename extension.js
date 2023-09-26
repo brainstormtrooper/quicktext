@@ -196,6 +196,8 @@ export default class QuickText extends Extension {
     
     if (this.entry.clutter_text.single_line_mode) {
       this.max_len = this.max_len_single;
+    } else {
+      this.max_len = this.max_len_multi;
     }
 
 
