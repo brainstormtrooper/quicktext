@@ -185,7 +185,7 @@ const QuickText = GObject.registerClass( // eslint-disable-line
               liSaveBtn.set_visible(false);
               liCancelBtn.set_visible(false);
               liTxtView.set_editable(false);
-              items[i] = `${liBuffer.get_text(liBuffer.get_start_iter(), liBuffer.get_end_iter(), true).trim()}\r`;
+              items[i] = `${liBuffer.get_text(liBuffer.get_start_iter(), liBuffer.get_end_iter(), true).trim()}\n`;
               this.doSave(this.doJoin(items));
               // this.toastOverlay.add_toast(undeleteToast);
               this.updateListUI(listBox);
@@ -283,7 +283,8 @@ const QuickText = GObject.registerClass( // eslint-disable-line
     getSummary(note) {
       const lines = note.trim().split("\n").slice(1);
       const summary = (lines[0].length > 90) ? lines[0].slice(0, n-1) + '...' : lines[0];
-      const desc = lines.join('\n');
+      const desc = note.match(/.{1,72}/g).join("\r\n ");
+      // const desc = lines.join('\n');
       return [summary, desc];
     }
 
