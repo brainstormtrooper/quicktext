@@ -38,6 +38,26 @@ fillPreferencesWindow(window) {
   oneLine.activatable_widget = toggle;
 
 
+
+  // Create a new preferences row
+  const hotkey = new Adw.ActionRow({ title: 'Hotkey to activate pop-up' });
+  group.add(hotkey);
+
+  const hotkeyEntry = new Gtk.Entry({
+    text: settings.get_strv('quick-hotkey')[0]
+  });
+
+  hotkeyEntry.connect('changed', () => {
+    const vals = [ hotkeyEntry.get_text() ];
+    settings.set_strv('quick-hotkey', vals);
+  });
+
+  // Add the switch to the row
+  hotkey.add_suffix(hotkeyEntry);
+  hotkey.activatable_widget = hotkeyEntry;
+
+
+
   // Create a new preferences row
   const filePath = new Adw.ActionRow({ title: 'Path to destination note file' });
   group.add(filePath);
