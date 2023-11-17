@@ -83,7 +83,7 @@ export default class QuickText extends Extension {
 
   doDialog() {
     this.max_len_multi = 1000;
-    this.max_len_single = 128;
+    this.max_len_single = 256;
     this.max_len = '';
 
     // show the quickNote dialog
@@ -128,7 +128,7 @@ export default class QuickText extends Extension {
 
     this.entry.clutter_text.connect('text-changed', () => {
       this.counter.set_text(`${this.entry.get_text().length}/${this.max_len}`);
-    })
+    });
 
     const box = new St.BoxLayout({
       width: 400,
@@ -196,6 +196,10 @@ export default class QuickText extends Extension {
     
     if (this.entry.clutter_text.single_line_mode) {
       this.max_len = this.max_len_single;
+      this.entry.clutter_text.connect('activate', () => {
+        this.doSaveSnippet();
+      });
+
     } else {
       this.max_len = this.max_len_multi;
     }
