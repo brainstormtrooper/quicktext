@@ -92,7 +92,7 @@ export default class QuickText extends Extension {
     let title = _('Save A Note');
 
     let content = new Dialog.MessageDialogContent({ title });
-    this.dialog.contentLayout.add_actor(content);
+    this.dialog.contentLayout.add_child(content);
     
 
     this.entry = new St.Entry({
@@ -120,7 +120,7 @@ export default class QuickText extends Extension {
       width: 400,
       style_class: 'scroll-box'
     });
-    scrollView.add_actor(layout);
+    scrollView.add_child(layout);
     
     this.counter = new St.Label({
       text: `${this.entry.get_text().length}/${this.max_len}`
